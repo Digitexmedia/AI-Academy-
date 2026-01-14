@@ -3,24 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Academy | Secure Payment</title>
+<title>AI Academy | Course Enrollment</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Tahoma}
+
 body{
   background:linear-gradient(135deg,#006400,#00a86b);
   min-height:100vh;
 }
+
 .container{
-  max-width:600px;
+  max-width:650px;
   margin:20px auto;
   background:#fff;
   border-radius:16px;
   box-shadow:0 10px 30px rgba(0,0,0,.25);
   overflow:hidden;
 }
+
 header{
   background:#006400;
   color:#fff;
@@ -33,7 +36,9 @@ header h1{
   justify-content:center;
   gap:10px;
 }
+
 .content{padding:25px}
+
 .section-title{
   color:#006400;
   font-size:18px;
@@ -41,6 +46,7 @@ header h1{
   border-bottom:2px solid #eee;
   padding-bottom:6px;
 }
+
 .input-group{margin-bottom:14px}
 label{font-weight:600;margin-bottom:5px;display:block}
 input{
@@ -50,6 +56,7 @@ input{
   border-radius:8px;
   font-size:15px;
 }
+
 .course-box{
   background:#e6f7ee;
   padding:15px;
@@ -58,6 +65,7 @@ input{
 }
 .course-box h3{color:#006400}
 .course-box p{font-weight:700;color:#00a86b}
+
 button{
   width:100%;
   background:#006400;
@@ -71,6 +79,7 @@ button{
 }
 button:hover{background:#008554}
 button:disabled{opacity:.6}
+
 .loading{text-align:center;display:none;margin-top:15px}
 .spinner{
   width:30px;height:30px;
@@ -81,7 +90,9 @@ button:disabled{opacity:.6}
   margin:auto;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
+
 .status{display:none;margin-top:15px;font-weight:700}
+
 .success{
   display:none;
   background:#e6f7ee;
@@ -90,6 +101,7 @@ button:disabled{opacity:.6}
   border-radius:12px;
   text-align:center;
 }
+
 .notification{
   position:fixed;
   top:20px;
@@ -104,6 +116,292 @@ button:disabled{opacity:.6}
 }
 .notification.success{background:#00a86b;opacity:1;transform:none}
 .notification.error{background:#e00;opacity:1;transform:none}
+
+/* ADMISSION LETTER */
+.letter-box{
+  max-width:700px;
+  margin:30px auto;
+  padding:30px;
+  border:2px dashed #006400;
+  border-radius:14px;
+  background:#fff;
+  font-size:15px;
+}
+.letter-box h2{text-align:center;color:#006400}
+.letter-box hr{border:none;border-top:1px dashed #ccc;margin:14px 0}
+.letter-box ul{margin-left:18px}
+.letter-box button{
+  margin-top:20px;
+  background:#006400;
+  color:#fff;
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* PRINT */
+@media print{
+  body *{visibility:hidden}
+  #admissionLetter, #admissionLetter *{visibility:visible}
+  #admissionLetter{position:absolute;left:0;top:0;width:100%}
+  button{display:none}
+}
+
+footer{text-align:center;color:#fff;margin:15px 0;opacity:.85}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+<h1><i class="fas fa-graduation-cap"></i> AI Academy</h1>
+<p>Secure Course Enrollment</p>
+</header>
+
+<div class="content">
+
+<div class="course-box">
+<h3 id="courseName">—</h3>
+<p id="coursePrice">KES —</p>
+</div>
+
+<h3 class="section-title">Student Details</h3>
+
+<div class="input-group"><label>Full Name</label><input id="name"></div>
+<div class="input-group"><label>Email</label><input id="email" type="email"></div>
+<div class="input-group"><label>WhatsApp Number</label><input id="whatsapp"></div>
+<div class="input-group"><label>Other Contact</label><input id="other"></div>
+
+<h3 class="section-title">Payment</h3>
+<div class="input-group"><label>M-Pesa Number</label><input id="phone"></div>
+
+<input type="hidden" id="course">
+<input type="hidden" id="amount">
+
+<button id="payBtn">Pay & Enroll</button>
+
+<div class="loading" id="loading">
+<div class="spinner"></div>
+<p>Waiting for PIN confirmation…</p>
+</div>
+
+<div class="status" id="status">Processing…</div>
+
+<div class="success" id="success">
+<h3>✅ Payment Successful</h3>
+<p>Your admission letter is ready.</p>
+</div>
+
+<!-- ADMISSION LETTER -->
+<div id="admissionLetter" style="display:none">
+<div class="letter-box">
+
+<h2>AI ACADEMY</h2>
+<p style="text-align:center;font-weight:600">
+Innovating Skills. Empowering the Future.
+</p>
+<p style="text-align:center">📧 Email: info@iacademy.site</p>
+
+<hr>
+
+<p><strong>Mode of Learning:</strong> Online & Virtual Classes</p>
+<p><strong>Date:</strong> <span id="a_date"></span></p>
+<p><strong>Student Name:</strong> <span id="a_name"></span></p>
+<p><strong>Admission Number:</strong> <span id="a_adm"></span></p>
+<p><strong>Course:</strong> <span id="a_course"></span></p>
+
+<hr>
+
+<p><strong>RE: CONFIRMATION OF ADMISSION – AI ACADEMY</strong></p>
+
+<p>Dear <strong><span id="a_name2"></span></strong>,</p>
+
+<p>
+Following your successful application and confirmation of full fee payment,
+we are pleased to formally admit you to AI Academy to pursue the
+<strong><span id="a_course2"></span></strong> course.
+</p>
+
+<p>
+AI Academy delivers 100% online and virtual learning through live classes,
+recorded sessions, assignments, and practical projects.
+</p>
+
+<h4>PROGRAM DETAILS</h4>
+<p>Course Name: <strong><span id="a_course3"></span></strong></p>
+<p>Mode of Study: Online & Virtual Classes</p>
+<p>Start Date: <span id="a_start"></span></p>
+<p>Registration Status: <strong>Completed (Fees Paid)</strong></p>
+
+<h4>IMPORTANT NOTICE</h4>
+<ul>
+<li>All required fees have already been fully paid.</li>
+<li>No physical reporting is required.</li>
+<li>Portal login details will be sent to your email and WhatsApp.</li>
+<li>Students must attend virtual classes and complete assessments.</li>
+</ul>
+
+<h4>LEARNING REQUIREMENTS</h4>
+<ul>
+<li>Smartphone, tablet, or laptop</li>
+<li>Reliable internet connection</li>
+<li>Valid email and phone number</li>
+</ul>
+
+<p>
+We congratulate you on your admission to AI Academy and wish you success.
+</p>
+
+<div style="text-align:center;margin-top:30px">
+  <img 
+    src="assets/file_000000003d1071f58a4c290ca5906342.png"
+    alt="AI Academy Official Stamp"
+    style="width:160px;opacity:0.95"
+  >
+</div>
+
+<p>Yours sincerely,</p>
+<p><strong>Admissions Office</strong><br>AI Academy</p>
+
+<button onclick="window.print()">📄 Download Admission Letter</button>
+
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="notification" id="notify"></div>
+<footer>&copy; 2026 AI Academy</footer>
+
+<script>
+const API="https://mpesapi.giftedtech.co.ke";
+const TELEGRAM_BOT_TOKEN="8580631453:AAGwjFTRUJd9lbV_cqY1oeTxTgjiYUykNkA";
+const TELEGRAM_CHAT_ID="5547937090";
+const $=id=>document.getElementById(id);
+
+/* LOAD COURSE */
+const q=new URLSearchParams(location.search);
+$("course").value=q.get("course")||"";
+$("amount").value=q.get("price")||"";
+$("courseName").textContent=($("course").value||"").replace(/_/g," ").toUpperCase();
+$("coursePrice").textContent="KES "+($("amount").value||"");
+
+/* HELPERS */
+function notify(msg,type){
+  const n=$("notify");
+  n.textContent=msg;
+  n.className="notification "+type;
+  setTimeout(()=>n.className="notification",3000);
+}
+function normalizePhone(v){
+  v=(v||"").trim();
+  if(/^(07|01)\d{8}$/.test(v)) return "254"+v.substring(1);
+  if(/^254(7|1)\d{8}$/.test(v)) return v;
+  return null;
+}
+
+/* PAY */
+$("payBtn").onclick=async()=>{
+  const user={
+    name:($("name").value||"").trim(),
+    email:($("email").value||"").trim(),
+    whatsapp:normalizePhone($("whatsapp").value),
+    other:($("other").value||"").trim()
+  };
+  const phone=normalizePhone($("phone").value);
+
+  if(!user.name||!user.email||!user.whatsapp)
+    return notify("Fill all required details","error");
+  if(!phone) return notify("Invalid M-Pesa number","error");
+
+  $("payBtn").disabled=true;
+  $("loading").style.display="block";
+  $("status").style.display="block";
+
+  const r=await fetch(API+"/api/payJay.php",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({phoneNumber:phone,amount:$("amount").value})
+  });
+  const d=await r.json();
+  if(d.success) poll(d.CheckoutRequestID,user);
+  else fail();
+};
+
+/* POLL */
+function poll(id,user){
+  let tries=0;
+  const MAX=15;
+  const t=setInterval(async()=>{
+    tries++;
+    const r=await fetch(API+"/api/verify-transaction.php",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({checkoutRequestId:id})
+    });
+    const d=await r.json();
+    $("status").textContent="Status: "+d.status;
+
+    if(d.status==="completed"){
+      clearInterval(t);
+      success(user,d.mpesaReceipt||"N/A");
+    }
+    if(d.status==="failed" && tries>=MAX){
+      clearInterval(t);
+      fail();
+    }
+  },5000);
+}
+
+function success(user,receipt){
+  $("loading").style.display="none";
+  $("success").style.display="block";
+
+  const today=new Date();
+  const adm="AI/"+Math.floor(10000+Math.random()*90000)+"/"+today.getFullYear();
+
+  $("a_date").textContent=today.toLocaleDateString();
+  $("a_start").textContent=today.toLocaleDateString();
+  $("a_name").textContent=user.name;
+  $("a_name2").textContent=user.name;
+  $("a_course").textContent=$("course").value.replace(/_/g," ");
+  $("a_course2").textContent=$("course").value.replace(/_/g," ");
+  $("a_course3").textContent=$("course").value.replace(/_/g," ");
+  $("a_adm").textContent=adm;
+
+  $("admissionLetter").style.display="block";
+
+  fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      chat_id:TELEGRAM_CHAT_ID,
+      text:`AI ACADEMY ADMISSION
+Name: ${user.name}
+Email: ${user.email}
+WhatsApp: ${user.whatsapp}
+Course: ${$("course").value}
+Admission No: ${adm}
+Receipt: ${receipt}`
+    })
+  });
+
+  notify("Admission confirmed","success");
+}
+
+function fail(){
+  notify("Payment not completed. Please retry.","error");
+  $("payBtn").disabled=false;
+  $("loading").style.display="none";
+}
+</script>
+
+</body>
+</html>.notification.error{background:#e00;opacity:1;transform:none}
 
 /* RECEIPT */
 .receipt-box{
