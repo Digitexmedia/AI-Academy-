@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Academy | Student Dashboard</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Tahoma}
+body{background:#f5f7fb;color:#222}
+
+/* HEADER */
+header{
+  background:linear-gradient(135deg,#0a3d2e,#00a86b);
+  color:#fff;
+  padding:20px;
+  text-align:center;
+}
+
+/* CONTAINER */
+.container{max-width:1100px;margin:auto;padding:30px 20px}
+
+/* LOGIN */
+.login-box{
+  max-width:420px;
+  margin:60px auto;
+  background:#fff;
+  padding:30px;
+  border-radius:16px;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+.login-box h2{text-align:center;color:#006400;margin-bottom:20px}
+.input-group{margin-bottom:14px}
+label{font-weight:600;margin-bottom:5px;display:block}
+input{
+  width:100%;
+  padding:12px;
+  border:2px solid #ddd;
+  border-radius:8px;
+}
+button{
+  width:100%;
+  padding:12px;
+  background:#006400;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+button:hover{background:#008554}
+.error{color:#e00;font-weight:600;margin-top:10px;text-align:center}
+
+/* DASHBOARD */
+.profile{
+  background:#fff;
+  border-radius:16px;
+  padding:25px;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+  margin-bottom:30px;
+}
+.profile h2{color:#006400}
+
+.section-title{font-size:22px;color:#006400;margin-bottom:15px}
+
+.courses{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+}
+.course{
+  background:#fff;
+  border-radius:16px;
+  padding:22px;
+  box-shadow:0 6px 20px rgba(0,0,0,.08);
+}
+.badge{
+  display:inline-block;
+  padding:5px 12px;
+  background:#e6f7ee;
+  color:#006400;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:700;
+}
+
+.progress{background:#eee;border-radius:8px;overflow:hidden;margin:10px 0}
+.progress div{height:8px;background:#00a86b}
+
+.lesson{
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px dashed #ddd;
+  font-size:14px;
+}
+
+.btn{
+  display:inline-flex;
+  gap:6px;
+  padding:8px 14px;
+  background:#006400;
+  color:#fff;
+  border-radius:8px;
+  text-decoration:none;
+  font-weight:600;
+  margin-top:10px;
+  cursor:pointer;
+}
+.btn.secondary{background:#00a86b}
+.btn.disabled{opacity:.5;pointer-events:none}
+
+footer{text-align:center;margin:30px 0;color:#777}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1><i class="fas fa-user-graduate"></i> AI Academy</h1>
+<p>Student Learning Dashboard</p>
+</header>
+
+<!-- LOGIN -->
+<div id="login" class="login-box">
+<h2>Student Login</h2>
+
+<div class="input-group">
+<label>Registered Email</label>
+<input id="loginEmail" type="email">
+</div>
+
+<div class="input-group">
+<label>Registered Phone / WhatsApp</label>
+<input id="loginPhone" placeholder="07 / 01 / 254">
+</div>
+
+<button onclick="login()">Login</button>
+<div class="error" id="loginError"></div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none">
+<div class="container">
+
+<div class="profile">
+<h2 id="studentName"></h2>
+<p>Email: <span id="studentEmail"></span></p>
+<p>WhatsApp: <span id="studentWhatsApp"></span></p>
+<button class="btn secondary" onclick="logout()">Logout</button>
+</div>
+
+<h2 class="section-title">My Courses</h2>
+<div class="courses" id="courses"></div>
+
+</div>
+</div>
+
+<footer>&copy; 2026 AI Academy</footer>
+
+<script>
+/* HELPERS */
+const $ = id => document.getElementById(id);
+
+function normalizePhone(v){
+  v=(v||"").trim();
+  if(/^(07|01)\d{8}$/.test(v)) return "254"+v.substring(1);
+  if(/^254(7|1)\d{8}$/.test(v)) return v;
+  return null;
+}
+
+/* LOGIN */
+function login(){
+  const email = $("loginEmail").value.trim();
+  const phone = normalizePhone($("loginPhone").value);
+
+  const student = JSON.parse(localStorage.getItem("ai_student") || "{}");
+
+  if(!student.email){
+    $("loginError").textContent="No registered student found. Please enroll first.";
+    return;
+  }
+
+  if(email === student.email && phone === student.whatsapp){
+    localStorage.setItem("ai_logged_in","true");
+    showDashboard();
+  }else{
+    $("loginError").textContent="Invalid email or phone number.";
+  }
+}
+
+/* LOGOUT */
+function logout(){
+  localStorage.removeItem("ai_logged_in");
+  location.reload();
+}
+
+/* DASHBOARD */
+function showDashboard(){
+  $("login").style.display="none";
+  $("dashboard").style.display="block";
+
+  const student = JSON.parse(localStorage.getItem("ai_student"));
+  const courses = JSON.parse(localStorage.getItem("ai_courses") || "[]");
+
+  $("studentName").textContent = student.name;
+  $("studentEmail").textContent = student.email;
+  $("studentWhatsApp").textContent = student.whatsapp;
+
+  const lessonMap={
+    "ai basics":["Intro to AI","AI Tools","Ethics","Quiz"],
+    "prompt engineering":["Basics","Advanced","Automation","Project"]
+  };
+
+  const box = $("courses");
+  box.innerHTML="";
+
+  courses.forEach((c,i)=>{
+    c.completed = c.completed || [];
+    const lessons = lessonMap[c.name.toLowerCase()] || ["Lesson 1","Lesson 2","Lesson 3"];
+    const progress = Math.round((c.completed.length / lessons.length) * 100);
+
+    const div=document.createElement("div");
+    div.className="course";
+    div.innerHTML=`
+      <span class="badge">${progress===100?"Completed":"Active"}</span>
+      <h3>${c.name}</h3>
+      <p>Paid: KES ${c.amount}</p>
+
+      <div class="progress"><div style="width:${progress}%"></div></div>
+      <p>${progress}% completed</p>
+
+      ${lessons.map(l=>`
+        <div class="lesson">
+          <span>${l}</span>
+          <button class="btn secondary" onclick="completeLesson(${i},'${l}')">✓</button>
+        </div>
+      `).join("")}
+
+      <button class="btn ${progress===100?"":"disabled"}"
+        onclick="downloadCert('${c.name}')">
+        <i class="fas fa-certificate"></i> Certificate
+      </button>
+    `;
+    box.appendChild(div);
+  });
+}
+
+/* LESSON COMPLETE */
+function completeLesson(i,l){
+  const courses = JSON.parse(localStorage.getItem("ai_courses"));
+  if(!courses[i].completed) courses[i].completed=[];
+  if(!courses[i].completed.includes(l)){
+    courses[i].completed.push(l);
+    localStorage.setItem("ai_courses",JSON.stringify(courses));
+    showDashboard();
+  }
+}
+
+/* CERTIFICATE */
+function downloadCert(course){
+  const student = JSON.parse(localStorage.getItem("ai_student"));
+  const w=window.open("","_blank");
+  w.document.write(`
+    <h1>AI Academy Certificate</h1>
+    <p>This certifies that <b>${student.name}</b></p>
+    <p>has successfully completed</p>
+    <h2>${course}</h2>
+    <p>Date: ${new Date().toLocaleDateString()}</p>
+    <script>window.print()</script>
+  `);
+}
+
+/* AUTO LOGIN */
+if(localStorage.getItem("ai_logged_in")==="true"){
+  showDashboard();
+}
+</script>
+
+</body>
+</html>
