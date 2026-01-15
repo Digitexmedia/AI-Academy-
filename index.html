@@ -45,6 +45,22 @@ box-shadow:0 4px 15px rgba(0,0,0,.08)
 nav a{text-decoration:none;color:#006400;font-weight:600;margin-left:15px}
   
 
+/* LOGO */
+.logo-box{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:700;
+  font-size:18px;
+  color:#006400;
+}
+
+.logo-box img{
+  height:42px;
+  width:auto;
+}
+
+
   
 /* HEADER */
   
@@ -430,19 +446,17 @@ opacity:.9
 
   
 <nav>
-  
-<strong>AI Academy</strong>
-  
-<div>
-  
-<a href="index.html">Home</a>
-  
-<a href="courses.html">Courses</a>
-  
-<a href="courses.html">Enroll</a>
-  
-</div>
-  
+  <div class="logo-box">
+    <img src="assets/file_00000000f60072309c17edf098cb80ee (1).png" alt="AI Academy Logo">
+    
+    <span>AI Academy</span>
+  </div>
+
+  <div>
+    <a href="index.html">Home</a>
+    <a href="courses.html">Courses</a>
+    <a href="pay.html">Enroll</a>
+  </div>
 </nav>
   
 
@@ -831,7 +845,7 @@ Enroll Now
 </div>
 
 <div class="course">
-<h3>AI Web Hosting</h3>
+<h3>Train AI And get Paid</h3>
 
 <div class="meta">
 <span><strong>Duration:</strong> 2 Weeks</span>
@@ -840,14 +854,15 @@ Enroll Now
 </div>
 
 <ul class="benefits">
-<li>AI-powered hosting solutions</li>
+<li>Learn to train AI</li>
 <li>Automation & optimization</li>
-<li>Sell hosting services</li>
+<li>Data Annotation </li>
+<li>Connect to AI jobs </li>
 </ul>
 
 <div class="price">KES 2,000</div>
 
-<a class="btn" href="pay.html?course=ai_web_hosting&price=2000">
+<a class="btn" href="pay.html?course=ai_models_training&price=2000">
 Enroll Now
 </a>
 </div>
@@ -1053,4 +1068,4 @@ dynamicEnrollmentGrowth();
   
 </body>
   
-</html>
+  </html>
