@@ -140,6 +140,43 @@ button:disabled{opacity:.6}
   cursor:pointer;
 }
 
+/* REFER / GET DISCOUNT BUTTON */
+.btn.secondary{
+  background:linear-gradient(135deg,#25D366,#1ebe5d);
+  color:#fff;
+  border:none;
+  padding:12px 18px;
+  border-radius:10px;
+  font-weight:700;
+  font-size:15px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  cursor:pointer;
+  text-decoration:none;
+  box-shadow:0 6px 18px rgba(37,211,102,.45);
+  transition:all .3s ease;
+}
+
+.btn.secondary i{
+  font-size:18px;
+}
+
+.btn.secondary:hover{
+  transform:translateY(-2px) scale(1.02);
+  box-shadow:0 10px 25px rgba(37,211,102,.6);
+}
+
+.btn.secondary:active{
+  transform:scale(.97);
+}
+
+.btn.secondary:disabled{
+  opacity:.6;
+  pointer-events:none;
+}
+
 /* PRINT */
 @media print{
   body *{visibility:hidden}
@@ -168,6 +205,15 @@ footer{text-align:center;color:#fff;margin:15px 0;opacity:.85}
 <p id="coursePrice">KES —</p>
 </div>
 
+<!-- GET DISCOUNT -->
+<div style="margin-top:15px">
+  <a id="discountBtn"
+     class="btn secondary"
+     href="#">
+    Get Discount
+  </a>
+</div>
+
 <h3 class="section-title">Student Details</h3>
 
 <div class="input-group"><label>Full Name</label><input id="name"></div>
@@ -185,7 +231,7 @@ footer{text-align:center;color:#fff;margin:15px 0;opacity:.85}
 
 <div class="loading" id="loading">
 <div class="spinner"></div>
-<p>Waiting for PIN confirmation…</p>
+<p>STK push sent. Waiting for PIN confirmation…</p>
 </div>
 
 <div class="status" id="status">Processing…</div>
@@ -292,6 +338,23 @@ We congratulate you on your admission to AI Academy and wish you success.
 <footer>&copy; 2026 AI Academy</footer>
 
 <script>
+    
+  // READ COURSE & PRICE FROM URL
+const params = new URLSearchParams(window.location.search);
+const course = params.get("course");
+const price = params.get("price");
+
+// SAFETY CHECK
+if(!course || !price){
+  alert("Please select a course first.");
+  document.getElementById("discountBtn").style.display = "none";
+}else{
+  document.getElementById("discountBtn").onclick = () => {
+    window.location.href =
+      `refer.html?course=${encodeURIComponent(course)}&price=${encodeURIComponent(price)}`;
+  };
+}
+
 const API="https://mpesapi.giftedtech.co.ke";
 const TELEGRAM_BOT_TOKEN="8580631453:AAGwjFTRUJd9lbV_cqY1oeTxTgjiYUykNkA";
 const TELEGRAM_CHAT_ID="5547937090";
@@ -303,6 +366,7 @@ $("course").value=q.get("course")||"";
 $("amount").value=q.get("price")||"";
 $("courseName").textContent=($("course").value||"").replace(/_/g," ").toUpperCase();
 $("coursePrice").textContent="KES "+($("amount").value||"");
+
 
 /* HELPERS */
 function notify(msg,type){
