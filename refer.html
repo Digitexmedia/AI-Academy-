@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Academy | Referral Benefits</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Tahoma}
+body{
+  background:linear-gradient(135deg,#006400,#00a86b);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.box{
+  background:#fff;
+  width:100%;
+  max-width:420px;
+  border-radius:18px;
+  padding:32px 28px;
+  box-shadow:0 12px 35px rgba(0,0,0,.25);
+  text-align:center;
+}
+h2{color:#006400;margin-bottom:10px}
+p{font-size:14.5px;margin-bottom:14px;color:#333}
+
+.progress-wrap{
+  background:#e6e6e6;
+  border-radius:10px;
+  overflow:hidden;
+  height:14px;
+  margin:18px 0;
+}
+.progress{
+  height:100%;
+  width:50%;
+  background:linear-gradient(90deg,#00a86b,#006400);
+  transition:width .5s ease;
+}
+
+button{
+  width:100%;
+  background:#006400;
+  color:#fff;
+  border:none;
+  padding:13px;
+  border-radius:12px;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  margin-top:14px;
+  transition:.3s;
+}
+button:disabled{opacity:.6;cursor:not-allowed}
+
+.msg{
+  font-weight:700;
+  margin-top:14px;
+  color:#006400;
+  line-height:1.5;
+}
+
+.small{
+  font-size:12px;
+  color:#666;
+  margin-top:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Unlock Enrollment Benefit</h2>
+
+<p>
+Refer a friend to join AI Academy and qualify for special enrollment benefits.
+</p>
+
+<div class="progress-wrap">
+  <div id="bar" class="progress"></div>
+</div>
+
+<p><strong><span id="percent">50%</span> progress</strong></p>
+
+<div class="msg" id="msg">
+Referral activity in progress…
+</div>
+
+<button id="referBtn">
+  <i class="fas fa-user-plus"></i> Refer a Friend
+</button>
+
+<div class="small">
+Benefits unlock gradually as referrals are verified
+</div>
+
+</div>
+
+<script>
+/* ========================
+   CONFIG
+======================== */
+const TARGET = 15;
+const DISCOUNT_RATE = 0.30;
+
+/* ========================
+   READ URL PARAMS
+======================== */
+const params = new URLSearchParams(window.location.search);
+const course = params.get("course");
+const priceParam = params.get("price");
+const price = Number(priceParam);
+
+if(!course || !priceParam || isNaN(price)){
+  document.body.innerHTML =
+    "<h3 style='color:white;text-align:center'>Invalid referral session</h3>";
+  throw new Error("Invalid referral session");
+}
+
+/* ========================
+   STATE
+======================== */
+let shares = Number(localStorage.getItem("ai_ref_shares") || 0);
+let unlocked = localStorage.getItem("ai_ref_unlocked") === "yes";
+let isProcessing = false;
+
+const bar = document.getElementById("bar");
+const percent = document.getElementById("percent");
+const msg = document.getElementById("msg");
+const btn = document.getElementById("referBtn");
+
+/* ========================
+   UPDATE PROGRESS
+======================== */
+function update(){
+  let progress;
+
+  if(shares <= 10){
+    progress = 50 + (shares / 10) * 40;   // fast
+  }else{
+    progress = 90 + ((shares - 10) / 5) * 10; // slow
+  }
+
+  progress = Math.min(100, Math.round(progress));
+  bar.style.width = progress + "%";
+  percent.textContent = progress + "%";
+
+  if(progress >= 100){
+    showUnlockedState();
+  }else{
+    msg.textContent = "Referral verified. Updating benefits…";
+  }
+}
+
+/* ========================
+   SUCCESS STATE
+======================== */
+function showUnlockedState(){
+  const finalPrice = Math.round(price * (1 - DISCOUNT_RATE));
+
+  msg.innerHTML =
+    `You have qualified for a <strong>30% enrollment benefit</strong>.<br>
+     Your final course fee is <strong>KES ${finalPrice}</strong>.<br>
+     Completing enrollment…`;
+
+  btn.disabled = true;
+  btn.textContent = "Benefit Qualified ✔";
+
+  if(!unlocked){
+    unlocked = true;
+    localStorage.setItem("ai_ref_unlocked","yes");
+
+    setTimeout(()=>{
+      window.location.href =
+        `pay.html?course=${encodeURIComponent(course)}&price=${finalPrice}`;
+    }, 3500);
+  }
+}
+
+/* ========================
+   REFER ACTION
+======================== */
+btn.onclick = () => {
+  if(unlocked || isProcessing) return;
+
+  isProcessing = true;
+  btn.disabled = true;
+  btn.textContent = "Verifying referral…";
+
+  // silent referral channel (WhatsApp)
+  const link =
+    window.location.origin +
+    "/pay.html?course=" +
+    encodeURIComponent(course) +
+    "&price=" +
+    encodeURIComponent(price);
+
+    const text = encodeURIComponent(
+  `🎓 AI ACADEMY – ONLINE LEARNING
+Upgrade your future with AI Academy, a modern learning institution offering 100% online and virtual classes designed to equip learners with practical, in-demand AI and digital skills.
+
+✅ Learn from anywhere
+✅ Flexible virtual classes
+✅ Practical, career-focused training
+✅ No physical attendance required
+
+📩 Enrollment is open
+📧 Email: info@iacademy.site
+🎓 Class of 2026
+
+${link}`
+);
+
+  window.open("https://wa.me/?text=" + text, "_blank");
+
+  // verification delay (5–8 seconds)
+  const delay = Math.floor(Math.random() * 3000) + 5000;
+
+  setTimeout(() => {
+    if(shares < TARGET){
+      shares++;
+      localStorage.setItem("ai_ref_shares", shares);
+    }
+
+    update();
+    isProcessing = false;
+
+    if(!unlocked){
+      btn.disabled = false;
+      btn.textContent = "Refer a Friend";
+    }
+  }, delay);
+};
+
+/* ========================
+   INIT
+======================== */
+update();
+</script>
+
+</body>
+  </html>
